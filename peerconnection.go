@@ -1241,14 +1241,7 @@ func (pc *PeerConnection) startRTPReceivers(incomingTracks []trackDetails, curre
 func (pc *PeerConnection) startRTPSenders(currentTransceivers []*RTPTransceiver) {
 	for _, transceiver := range currentTransceivers {
 		if transceiver.Sender() != nil && transceiver.Sender().isNegotiated() && !transceiver.Sender().hasSent() {
-			err := transceiver.Sender().Send(RTPSendParameters{
-				Encodings: RTPEncodingParameters{
-					RTPCodingParameters{
-						SSRC:        transceiver.Sender().ssrc,
-						PayloadType: transceiver.Sender().payloadType,
-					},
-				},
-			})
+			err := transceiver.Sender().Send()
 			if err != nil {
 				pc.log.Warnf("Failed to start Sender: %s", err)
 			}

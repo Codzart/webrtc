@@ -95,7 +95,7 @@ func (r *RTPSender) setTrack(track TrackLocal) {
 }
 
 // Send Attempts to set the parameters controlling the sending of media.
-func (r *RTPSender) Send(parameters RTPSendParameters) error {
+func (r *RTPSender) Send() error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -108,7 +108,7 @@ func (r *RTPSender) Send(parameters RTPSendParameters) error {
 		return err
 	}
 
-	r.rtcpReadStream, err = srtcpSession.OpenReadStream(uint32(parameters.Encodings.SSRC))
+	r.rtcpReadStream, err = srtcpSession.OpenReadStream(uint32(r.ssrc))
 	if err != nil {
 		return err
 	}
@@ -126,13 +126,18 @@ func (r *RTPSender) Send(parameters RTPSendParameters) error {
 	if err = r.track.Bind(TrackLocalContext{
 		id:          r.id,
 		codecs:      r.api.mediaEngine.getCodecsByKind(r.track.Kind()),
-		ssrc:        parameters.Encodings.SSRC,
+		ssrc:        r.ssrc,
 		writeStream: rtpWriteStream,
 	}); err != nil {
 		return err
 	}
 
-	r.encodingParameters = parameters.Encodings
+	r.encodingParameters = RTPEncodingParameters{
+		RTPCodingParameters{
+			SSRC:        r.ssrc,
+			PayloadType: r.payloadType,
+		},
+	}
 
 	close(r.sendCalled)
 	return nil
