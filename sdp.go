@@ -650,7 +650,7 @@ func rtpExtensionsFromMediaDescription(m *sdp.MediaDescription) (map[string]int,
 	for _, a := range m.Attributes {
 		if a.Key == sdp.AttrKeyExtMap {
 			e := sdp.ExtMap{}
-			if err := e.Unmarshal(*a.String()); err != nil {
+			if err := e.Unmarshal(a.String()); err != nil {
 				return nil, err
 			}
 
