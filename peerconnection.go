@@ -1512,8 +1512,14 @@ func (pc *PeerConnection) RemoveTrack(sender *RTPSender) error {
 		return &rtcerr.InvalidStateError{Err: ErrConnectionClosed}
 	}
 
+	pc.mu.Lock()
+	defer func() {
+		pc.mu.Unlock()
+		pc.onNegotiationNeeded()
+	}()
+
 	var transceiver *RTPTransceiver
-	for _, t := range pc.GetTransceivers() {
+	for _, t := range pc.rtpTransceivers {
 		if t.Sender() == sender {
 			transceiver = t
 			break
