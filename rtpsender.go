@@ -222,7 +222,7 @@ func (r *RTPSender) GetParameters() RTPSendParameters {
 	return RTPSendParameters{
 		Encodings:        r.encodingParameters,
 		HeaderExtensions: r.headerExtensions,
-		Codecs:           r.api.mediaEngine.getCodecsByKind(r.track.Kind()),
+		Codecs:           []RTPCodecParameters{r.codec},
 	}
 }
 

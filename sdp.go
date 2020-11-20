@@ -300,7 +300,7 @@ func addTransceiverSDP(d *sdp.SessionDescription, isPlanB, shouldAddCandidates b
 			media.WithValueAttribute("rtcp-fb", fmt.Sprintf("%d %s %s", codec.PayloadType, feedback.Type, feedback.Parameter))
 		}
 	}
-	if len(codecs) == 0 {
+	if len(codecs) == 0 && isPlanB {
 		// Explicitly reject track if we don't have the codec
 		d.WithMedia(&sdp.MediaDescription{
 			MediaName: sdp.MediaName{
@@ -311,6 +311,10 @@ func addTransceiverSDP(d *sdp.SessionDescription, isPlanB, shouldAddCandidates b
 			},
 		})
 		return false, nil
+	} else if len(codecs) == 0 && !isPlanB {
+		if err := t.Stop(); err != nil {
+			return false, err
+		}
 	}
 
 	if isPlanB {
